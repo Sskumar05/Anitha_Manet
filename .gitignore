@@ -1,0 +1,36 @@
+# NS-3 build output
+ns-3-dev/build/
+ns-3-dev/__pycache__/
+ns-3-dev/.lock-ns3*
+ns-3-dev/cmake-cache/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+.venv/
+venv/
+env/
+
+# Simulation results (large XML files)
+results/*.xml
+results/graphs/*.png
+results/final/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
