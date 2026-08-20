@@ -34,3 +34,7 @@ desktop.ini
 
 # Logs
 *.log
+
+# Markdown docs (exclude README.md)
+*.md
+!README.md
