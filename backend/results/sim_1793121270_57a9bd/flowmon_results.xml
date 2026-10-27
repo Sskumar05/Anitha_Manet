@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<FlowMonitor>
+  <FlowStats>
+    <Flow flowId="1" timeFirstTxPacket="+0.0ns" timeFirstRxPacket="+1000000.0ns"
+          timeLastTxPacket="+10.0s" timeLastRxPacket="+10.0s"
+          delaySum="13614500000ns" jitterSum="1200000ns" lastDelay="4500000ns"
+          txBytes="32000" rxBytes="23360" txPackets="500" rxPackets="365"
+          lostPackets="135" timesForwarded="730">
+    </Flow>
+  </FlowStats>
+</FlowMonitor>

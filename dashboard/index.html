@@ -7,297 +7,571 @@
   <meta name="description" content="Live simulation dashboard for Reliable and Efficient Routing in Highly Dynamic MANETs — comparing standard AODV vs Energy-Aware AODV (eAODV) performance metrics."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-<!-- Animated particle background -->
+<!-- Animated particle background (soft ambient particles on outer grey surface) -->
 <div class="bg-particles" id="particles"></div>
 
-<!-- ===== NAVBAR ===== -->
-<nav class="navbar">
-  <div class="nav-brand">
-    <div class="brand-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-        <circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/>
-        <circle cx="12" cy="19" r="2"/><circle cx="19" cy="12" r="2"/>
-        <circle cx="5" cy="12" r="2"/>
-        <path d="M7 5h10M5 7v3M19 7v3M7 19h4M17 12l-4 7M7 12l4 7M5 14l12-2"/>
-      </svg>
-    </div>
-    <div>
-      <span class="brand-title">MANET Research Lab</span>
-      <span class="brand-sub">CS2708 · Energy-Aware AODV Protocol</span>
-    </div>
-  </div>
-  <nav class="nav-pills">
-    <a class="nav-pill active" href="#overview">Overview</a>
-    <a class="nav-pill" href="#simulation">Simulation</a>
-    <a class="nav-pill" href="#analysis">Analysis</a>
-    <a class="nav-pill" href="#topology">Topology</a>
-    <a class="nav-pill" href="#algorithm">Algorithm</a>
-  </nav>
-  <div class="nav-status">
-    <div class="status-dot pulse"></div>
-    NS-3 Simulation Ready
-  </div>
-</nav>
+<!-- Outer centered dashboard shell -->
+<div class="dashboard-shell">
+  <main class="dashboard-canvas">
 
-<!-- ===== HERO ===== -->
-<section class="hero" id="overview">
-  <div class="hero-text">
-    <span class="hero-badge"><span class="badge-dot"></span> Final Year Project · Phase II Demo</span>
-    <h1>Reliable Routing in<br/><span class="gradient-text">Dynamic MANETs</span></h1>
-    <p class="hero-sub">
-      Designing an <strong>Energy-Aware AODV (eAODV)</strong> protocol that outperforms standard AODV 
-      on Packet Delivery Ratio, End-to-End Delay, Routing Overhead, and Energy Consumption across 
-      highly mobile wireless networks — validated via <strong>NS-3 simulation</strong>.
-    </p>
-    <div class="hero-team">
-      <span class="team-chip">👤 Anitha G</span>
-      <span class="team-chip">👤 Elanthalir K</span>
-      <span class="team-chip">👤 Harini G.P</span>
-      <span class="team-chip mentor">🎓 Guide: Dr. Sugumaran V.R</span>
-      <span class="team-chip">📚 Batch: CS2708</span>
-    </div>
-  </div>
-  <div class="hero-visual">
-    <canvas id="heroNetCanvas" class="network-anim" width="340" height="280"></canvas>
-  </div>
-</section>
-
-<!-- ===== KPI CARDS ===== -->
-<section class="kpi-section" id="kpi">
-  <p class="section-label">📊 Key Performance Indicators — eAODV vs AODV Improvement</p>
-  <div class="kpi-grid">
-    <div class="kpi-card kpi-pdr" id="kpi-pdr">
-      <div class="kpi-icon">📡</div>
-      <div class="kpi-label">Packet Delivery Ratio (PDR)</div>
-      <div class="kpi-value" id="pdr-val">91.4%</div>
-      <div class="kpi-delta positive">▲ +18.2% over standard AODV</div>
-      <div class="kpi-progress"><div class="kpi-bar" id="pdr-bar" style="width: 0%; background: linear-gradient(90deg,#6c63ff,#00d4aa)"></div></div>
-    </div>
-    <div class="kpi-card kpi-delay">
-      <div class="kpi-icon">⚡</div>
-      <div class="kpi-label">Avg End-to-End Delay</div>
-      <div class="kpi-value" id="delay-val">42 ms</div>
-      <div class="kpi-delta positive">▼ −38.5% latency reduction</div>
-      <div class="kpi-progress"><div class="kpi-bar" id="delay-bar" style="width: 0%; background: linear-gradient(90deg,#00d4aa,#00b4d8)"></div></div>
-    </div>
-    <div class="kpi-card kpi-overhead">
-      <div class="kpi-icon">📶</div>
-      <div class="kpi-label">Routing Overhead</div>
-      <div class="kpi-value" id="overhead-val">0.31</div>
-      <div class="kpi-delta positive">▼ −29.1% control overhead</div>
-      <div class="kpi-progress"><div class="kpi-bar" id="overhead-bar" style="width: 0%; background: linear-gradient(90deg,#ffd166,#ff9f43)"></div></div>
-    </div>
-    <div class="kpi-card kpi-energy">
-      <div class="kpi-icon">🔋</div>
-      <div class="kpi-label">Energy Consumed (avg/node)</div>
-      <div class="kpi-value" id="energy-val">1.24 J</div>
-      <div class="kpi-delta positive">▼ −22.3% energy savings</div>
-      <div class="kpi-progress"><div class="kpi-bar" id="energy-bar" style="width: 0%; background: linear-gradient(90deg,#ff6b6b,#ffd166)"></div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== LIVE SIMULATION ===== -->
-<section class="sim-section" id="simulation">
-  <div class="section-header">
-    <div>
-      <h2>🔬 Live Network Simulation</h2>
-      <p>Configure parameters and watch the MANET topology evolve in real time</p>
-    </div>
-    <button class="run-btn" id="runSimBtn" onclick="toggleSim()">
-      <span id="runBtnIcon">▶</span> <span id="runBtnLabel">Run Simulation</span>
-    </button>
-  </div>
-
-  <div class="sim-layout">
-    <div class="sim-controls">
-      <div class="control-group">
-        <label>Protocol</label>
-        <div class="toggle-group">
-          <button class="proto-btn active" id="pb-aodv" onclick="setProto('AODV')">AODV</button>
-          <button class="proto-btn" id="pb-eaodv" onclick="setProto('eAODV')">eAODV</button>
-          <button class="proto-btn" id="pb-both" onclick="setProto('BOTH')">Both</button>
+    <!-- ===== TOP NAVBAR ===== -->
+    <nav class="navbar">
+      <div class="nav-brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="5" cy="5" r="2.2"/><circle cx="19" cy="5" r="2.2"/>
+            <circle cx="12" cy="19" r="2.2"/><circle cx="19" cy="12" r="2.2"/>
+            <circle cx="5" cy="12" r="2.2"/>
+            <path d="M7 5h10M5 7v3M19 7v3M7 19h4M17 12l-4 7M7 12l4 7M5 14l12-2"/>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-title">MANET Research Lab</span>
+          <span class="brand-sub">CS2708 · Energy-Aware AODV Protocol</span>
         </div>
       </div>
-      <div class="control-group">
-        <label>Node Count: <span id="nodeCountLabel">50</span></label>
-        <div class="slider-row">
-          <input type="range" id="nodeCount" min="10" max="100" value="50" oninput="updateSim()"/>
-          <span class="slider-val" id="nodeCountVal">50</span>
+
+      <nav class="nav-pills">
+        <a class="nav-pill active" href="#overview">Overview</a>
+        <a class="nav-pill" href="#simulation">Simulation</a>
+        <a class="nav-pill" href="#analysis">Analysis</a>
+        <a class="nav-pill" href="#topology">Topology</a>
+        <a class="nav-pill" href="#algorithm">Algorithm</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="nav-icon-btn" title="System Settings" aria-label="Settings" onclick="document.querySelector('#simulation').scrollIntoView({behavior:'smooth'})">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
+        <div class="notif-wrapper">
+          <button class="nav-icon-btn" id="notifBellBtn" title="Simulation Notifications" aria-label="Notifications" aria-haspopup="dialog" aria-expanded="false" aria-controls="notifDropdown" onclick="toggleNotifDropdown(event)">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="nav-icon-dot" id="notifDot" aria-hidden="true"></span>
+          </button>
+
+          <div class="notif-dropdown" id="notifDropdown" role="dialog" aria-label="Simulation Notifications" aria-hidden="true">
+            <div class="notif-header">
+              <div class="notif-header-left">
+                <span class="notif-title">Simulation Events</span>
+                <span class="notif-count-pill" id="notifCountPill">Live</span>
+              </div>
+              <div class="notif-status-badge" id="notifStatusBadge">
+                <span class="notif-status-dot"></span>
+                <span id="notifStatusText">NS-3 Ready</span>
+              </div>
+            </div>
+
+            <div class="notif-body">
+              <div class="notif-list" id="notifList" role="log" aria-live="polite">
+                <!-- Dynamically populated from actual #simLog -->
+              </div>
+            </div>
+
+            <div class="notif-footer">
+              <button type="button" class="notif-view-logs-btn" id="notifViewLogsBtn" onclick="viewConsoleLogsFromNotif(event)">
+                <span>View Console Logs</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="nav-status">
+          <div class="status-dot pulse"></div>
+          NS-3 Simulation Ready
         </div>
       </div>
-      <div class="control-group">
-        <label>Max Speed: <span id="speedLabel">10 m/s</span></label>
-        <div class="slider-row">
-          <input type="range" id="nodeSpeed" min="1" max="25" value="10" oninput="updateSim()"/>
-          <span class="slider-val" id="nodeSpeedVal">10 m/s</span>
+    </nav>
+
+    <!-- ===== GREETING & PRIMARY ACTION BAR ===== -->
+    <header class="dashboard-header-bar">
+      <div class="greeting-content">
+        <h1 class="greeting-title">Good Morning, Researcher!</h1>
+        <p class="greeting-sub">Reliable and Energy-Aware Routing in Dynamic MANETs</p>
+      </div>
+      <!-- <div class="header-action-group">
+        <button class="btn-check-new" onclick="toggleSim()">
+          <span class="plus-icon">+</span>
+          <span>Run Simulation</span>
+        </button>
+      </div> -->
+    </header>
+
+    <!-- ===== SECONDARY TOOLBAR & FILTERS ===== -->
+    <div class="dashboard-toolbar">
+      <div class="toolbar-left">
+        <button class="toolbar-pill" onclick="document.querySelector('#simulation').scrollIntoView({behavior:'smooth'})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          <span>Filter</span>
+        </button>
+        <button class="toolbar-pill dropdown" onclick="document.querySelector('#analysis').scrollIntoView({behavior:'smooth'})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>eAODV vs AODV</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <!-- <button class="toolbar-pill" onclick="window.print()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download Data</span>
+        </button> -->
+      </div>
+      <div class="toolbar-right">
+        <!-- <div class="toolbar-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Search metrics...</span>
+        </div> -->
+        <button class="toolbar-pill" onclick="document.querySelector('#algorithm').scrollIntoView({behavior:'smooth'})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Support</span>
+        </button>
+        <button class="toolbar-pill" onclick="document.querySelector('#topology').scrollIntoView({behavior:'smooth'})">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Content Layout</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== HERO / OVERVIEW ===== -->
+    <section class="hero" id="overview">
+      <div class="hero-text">
+        <span class="hero-badge"><span class="badge-dot"></span> Final Year Project · Phase II Demo</span>
+        <h2 class="hero-main-title">Reliable Routing in<br/><span class="gradient-text">Dynamic MANETs</span></h2>
+        <p class="hero-sub">
+          Designing an <strong>Energy-Aware AODV (eAODV)</strong> protocol that outperforms standard AODV 
+          on Packet Delivery Ratio, End-to-End Delay, Routing Overhead, and Energy Consumption across 
+          highly mobile wireless networks — validated via <strong>NS-3 simulation</strong>.
+        </p>
+        <!-- <div class="hero-team">
+          <span class="team-chip">👤 Anitha G</span>
+          <span class="team-chip">👤 Elanthalir K</span>
+          <span class="team-chip">👤 Harini G.P</span>
+          <span class="team-chip mentor">🎓 Guide: Dr. Sugumaran V.R</span>
+          <span class="team-chip">📚 Batch: CS2708</span>
+        </div> -->
+      </div>
+
+      <!-- Signature Royal Blue Card (Directly inspired by reference card) -->
+      <div class="hero-visual featured-blue-card">
+        <div class="fbc-top">
+          <div class="fbc-icon-circle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="9"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          <span class="fbc-pill-tag">Protocol Core</span>
+        </div>
+        <div class="fbc-body">
+          <h3 class="fbc-title">eAODV Optimization Engine</h3>
+          <p class="fbc-desc">
+            Scoring route replies via remaining node battery level, preventing link failures before they happen and extending network lifetime by ~22%.
+          </p>
+        </div>
+        <div class="fbc-canvas-container">
+          <canvas id="heroNetCanvas" class="network-anim" width="340" height="140"></canvas>
+        </div>
+        <div class="fbc-progress-dashes">
+          <span class="fbc-dash active"></span>
+          <span class="fbc-dash"></span>
+          <span class="fbc-dash"></span>
+          <span class="fbc-dash"></span>
         </div>
       </div>
-      <div class="control-group">
-        <label>Sim Area</label>
-        <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="area" value="500" onchange="updateSim()"/> 500×500m</label>
-          <label class="radio-opt"><input type="radio" name="area" value="1000" checked onchange="updateSim()"/> 1000×1000m</label>
-          <label class="radio-opt"><input type="radio" name="area" value="2000" onchange="updateSim()"/> 2000×2000m</label>
+    </section>
+
+    <!-- ===== KPI CARDS ===== -->
+    <section class="kpi-section" id="kpi">
+      <div class="section-label-row">
+        <p class="section-label">Key Performance Indicators — eAODV vs AODV Improvement</p>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-pdr" id="kpi-pdr">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap icon-blue">
+              <span class="kpi-icon">📡</span>
+            </div>
+            <div class="kpi-label">Packet Delivery Ratio (PDR)</div>
+          </div>
+          <div class="kpi-value" id="pdr-val">91.4%</div>
+          <div class="kpi-delta positive">▲ +18.2% over standard AODV</div>
+          <div class="kpi-progress"><div class="kpi-bar" id="pdr-bar" style="width: 0%; background: linear-gradient(90deg,#2864E8,#5D8DF0)"></div></div>
+        </div>
+
+        <div class="kpi-card kpi-delay">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap icon-green">
+              <span class="kpi-icon">⚡</span>
+            </div>
+            <div class="kpi-label">Avg End-to-End Delay</div>
+          </div>
+          <div class="kpi-value" id="delay-val">42 ms</div>
+          <div class="kpi-delta positive">▼ −38.5% latency reduction</div>
+          <div class="kpi-progress"><div class="kpi-bar" id="delay-bar" style="width: 0%; background: linear-gradient(90deg,#10B981,#34D399)"></div></div>
+        </div>
+
+        <div class="kpi-card kpi-overhead">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap icon-amber">
+              <span class="kpi-icon">📶</span>
+            </div>
+            <div class="kpi-label">Routing Overhead</div>
+          </div>
+          <div class="kpi-value" id="overhead-val">0.31</div>
+          <div class="kpi-delta positive">▼ −29.1% control overhead</div>
+          <div class="kpi-progress"><div class="kpi-bar" id="overhead-bar" style="width: 0%; background: linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div>
+        </div>
+
+        <div class="kpi-card kpi-energy">
+          <div class="kpi-top">
+            <div class="kpi-icon-wrap icon-teal">
+              <span class="kpi-icon">🔋</span>
+            </div>
+            <div class="kpi-label">Energy Consumed (avg/node)</div>
+          </div>
+          <div class="kpi-value" id="energy-val">1.24 J</div>
+          <div class="kpi-delta positive">▼ −22.3% energy savings</div>
+          <div class="kpi-progress"><div class="kpi-bar" id="energy-bar" style="width: 0%; background: linear-gradient(90deg,#2864E8,#10B981)"></div></div>
         </div>
       </div>
-      <div class="control-group">
-        <label>Simulation Log</label>
-        <div class="sim-log" id="simLog">
-          <div class="log-line info">[INFO] NS-3 v3.40+ ready</div>
-          <div class="log-line info">[INFO] AODV module loaded</div>
-          <div class="log-line info">[INFO] eAODV module loaded</div>
-          <div class="log-line">[READY] Press Run to start ▶</div>
+    </section>
+
+    <!-- ===== LIVE SIMULATION ===== -->
+    <section class="sim-section" id="simulation">
+      <div class="section-header">
+        <div>
+          <h2>🔬 Live Network Simulation</h2>
+          <p>Configure parameters and watch the MANET topology evolve in real time</p>
+        </div>
+        <button class="run-btn" id="runSimBtn" onclick="toggleSim()">
+          <span id="runBtnIcon">▶</span> <span id="runBtnLabel">Run Simulation</span>
+        </button>
+      </div>
+
+      <div class="sim-layout">
+        <div class="sim-controls">
+          <div class="control-group">
+            <label>Routing Protocol</label>
+            <div class="toggle-group">
+              <button class="proto-btn active" id="pb-aodv" onclick="setProto('AODV')">AODV</button>
+              <button class="proto-btn" id="pb-eaodv" onclick="setProto('eAODV')">eAODV</button>
+              <button class="proto-btn" id="pb-both" onclick="setProto('BOTH')">Both</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label-row">
+              <label>Node Count</label>
+              <span class="slider-badge" id="nodeCountLabel">50</span>
+            </div>
+            <div class="slider-row">
+              <input type="range" id="nodeCount" min="10" max="100" value="50" oninput="updateSim()"/>
+              <span class="slider-val" id="nodeCountVal">50</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <div class="control-label-row">
+              <label>Max Speed</label>
+              <span class="slider-badge" id="speedLabel">10 m/s</span>
+            </div>
+            <div class="slider-row">
+              <input type="range" id="nodeSpeed" min="1" max="25" value="10" oninput="updateSim()"/>
+              <span class="slider-val" id="nodeSpeedVal">10 m/s</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Simulation Area</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="area" value="500" onchange="updateSim()"/> 500×500m</label>
+              <label class="radio-opt"><input type="radio" name="area" value="1000" checked onchange="updateSim()"/> 1000×1000m</label>
+              <label class="radio-opt"><input type="radio" name="area" value="2000" onchange="updateSim()"/> 2000×2000m</label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Simulation Console Log</label>
+            <div class="sim-log" id="simLog">
+              <div class="log-line info">[INFO] NS-3 v3.40+ ready</div>
+              <div class="log-line info">[INFO] AODV module loaded</div>
+              <div class="log-line info">[INFO] eAODV module loaded</div>
+              <div class="log-line">[READY] Press Run to start ▶</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sim-canvas-wrap">
+          <canvas id="simCanvas" width="660" height="400"></canvas>
+          <div class="canvas-legend">
+            <div class="leg-item"><div class="leg-dot node-norm"></div> Normal Node (high energy)</div>
+            <div class="leg-item"><div class="leg-dot node-low"></div> Low Energy Node</div>
+            <div class="leg-item"><div class="leg-dot node-route"></div> Active Route</div>
+            <div class="leg-item"><div class="leg-dot leg-packet"></div> Data Packet</div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="sim-canvas-wrap">
-      <canvas id="simCanvas" width="660" height="400"></canvas>
-      <div class="canvas-legend">
-        <div class="leg-item"><div class="leg-dot node-norm"></div> Normal Node (high energy)</div>
-        <div class="leg-item"><div class="leg-dot node-low"></div> Low Energy Node</div>
-        <div class="leg-item"><div class="leg-dot node-route"></div> Active Route</div>
-        <div class="leg-item"><div class="leg-dot" style="background: #ffd166;"></div> Data Packet</div>
+    <!-- ===== ANALYSIS CHARTS ===== -->
+    <section class="charts-section" id="analysis">
+      <div class="section-header">
+        <div>
+          <h2>📈 Performance Analysis</h2>
+          <p>AODV vs eAODV across varying node speeds and densities</p>
+        </div>
+        <div class="scenario-selector">
+          <button class="scen-btn active" onclick="loadScenario('speed', this)">vs Speed</button>
+          <button class="scen-btn" onclick="loadScenario('nodes', this)">vs Nodes</button>
+          <button class="scen-btn" onclick="loadScenario('traffic', this)">vs Traffic</button>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
 
-<!-- ===== ANALYSIS CHARTS ===== -->
-<section class="charts-section" id="analysis">
-  <div class="section-header">
-    <div>
-      <h2>📈 Performance Analysis</h2>
-      <p>AODV vs eAODV across varying node speeds and densities</p>
-    </div>
-    <div class="scenario-selector">
-      <button class="scen-btn active" onclick="loadScenario('speed', this)">vs Speed</button>
-      <button class="scen-btn" onclick="loadScenario('nodes', this)">vs Nodes</button>
-      <button class="scen-btn" onclick="loadScenario('traffic', this)">vs Traffic</button>
-    </div>
-  </div>
-
-  <div class="charts-grid">
-    <div class="chart-card">
-      <div class="chart-title">📡 Packet Delivery Ratio (%)</div>
-      <canvas id="chartPDR" height="200"></canvas>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">⚡ End-to-End Delay (ms)</div>
-      <canvas id="chartDelay" height="200"></canvas>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">📶 Routing Overhead (ratio)</div>
-      <canvas id="chartOverhead" height="200"></canvas>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">🔋 Energy Consumption (J)</div>
-      <canvas id="chartEnergy" height="200"></canvas>
-    </div>
-  </div>
-</section>
-
-<!-- ===== TOPOLOGY VISUALIZER ===== -->
-<section class="topology-section" id="topology">
-  <div class="section-header">
-    <div>
-      <h2>🗺️ Network Topology Visualizer</h2>
-      <p>Interactive MANET node distribution with transmission range overlay</p>
-    </div>
-    <div class="topo-controls">
-      <button class="topo-btn active" id="topoStatic" onclick="setTopo('static',this)">Static</button>
-      <button class="topo-btn" id="topoDynamic" onclick="setTopo('dynamic',this)">Dynamic</button>
-      <button class="topo-btn" id="topoRoute" onclick="setTopo('route',this)">Show Routes</button>
-    </div>
-  </div>
-
-  <div class="topo-wrap">
-    <canvas id="topoCanvas" height="380"></canvas>
-    <div class="topo-stats">
-      <div class="tstat"><div class="tstat-num" id="t-nodes">50</div><div class="tstat-label">Active Nodes</div></div>
-      <div class="tstat"><div class="tstat-num" id="t-links">127</div><div class="tstat-label">Active Links</div></div>
-      <div class="tstat"><div class="tstat-num" id="t-routes">8</div><div class="tstat-label">Active Routes</div></div>
-      <div class="tstat"><div class="tstat-num" id="t-pdr">91.4%</div><div class="tstat-label">Live PDR</div></div>
-      <div class="tstat"><div class="tstat-num" id="t-energy">87%</div><div class="tstat-label">Avg Energy</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== ALGORITHM COMPARISON ===== -->
-<section class="algo-section" id="algorithm">
-  <div class="section-header">
-    <div>
-      <h2>⚙️ Algorithm Design</h2>
-      <p>Standard AODV vs Energy-Aware AODV — key differences</p>
-    </div>
-  </div>
-
-  <div class="algo-grid">
-    <div class="algo-card">
-      <span class="algo-badge aodv-badge">STANDARD</span>
-      <h3>AODV Protocol</h3>
-      <ul>
-        <li>🔴 Route selection based on <strong>first reply</strong> (lowest latency)</li>
-        <li>🔴 <strong>No energy awareness</strong> — routes through dying nodes</li>
-        <li>🔴 Frequent route breaks under high mobility → heavy RREQ flooding</li>
-        <li>🔴 Battery drain concentrated on few hub nodes</li>
-        <li>🔴 Re-discovery delay spikes when a route collapses</li>
-        <li>🔴 High routing overhead at speeds &gt; 10 m/s</li>
-      </ul>
-    </div>
-
-    <div class="algo-arrow">
-      <svg viewBox="0 0 60 24" fill="none">
-        <path d="M0 12h54M44 4l14 8-14 8" stroke="url(#arrowGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <defs>
-          <linearGradient id="arrowGrad" x1="0" y1="0" x2="60" y2="0" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#6c63ff"/><stop offset="1" stop-color="#00d4aa"/>
-          </linearGradient>
-        </defs>
-      </svg>
-      Enhanced
-    </div>
-
-    <div class="algo-card eaodv-card">
-      <span class="algo-badge eaodv-badge">ENHANCED</span>
-      <h3>eAODV — Energy-Aware AODV</h3>
-      <ul>
-        <li>✅ Route selection via <strong>energy-weighted RREP scoring</strong></li>
-        <li>✅ Attaches <code>BasicEnergySource</code> model to each NS-3 node</li>
-        <li>✅ Penalises low-battery next-hops; prefers energy-rich nodes</li>
-        <li>✅ Energy threshold trigger proactive local route repair</li>
-        <li>✅ Balanced battery load extends network lifetime by ~22%</li>
-        <li>✅ Lower re-discovery cost → reduced overhead at all speeds</li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
-<footer class="footer">
-  <div class="footer-content">
-    <div class="footer-brand">
-      <div class="brand-icon small" style="background:linear-gradient(135deg,#6c63ff,#00d4aa)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
-          <circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/>
-          <path d="M7 5h10M7 19h4M5 7v3M19 7v3M17 12l-4 7M7 12l4 7"/>
-        </svg>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">📡 Packet Delivery Ratio (%)</div>
+            <span class="chart-tag">eAODV +18%</span>
+          </div>
+          <canvas id="chartPDR" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">⚡ End-to-End Delay (ms)</div>
+            <span class="chart-tag tag-green">−38.5% Latency</span>
+          </div>
+          <canvas id="chartDelay" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">📶 Routing Overhead (ratio)</div>
+            <span class="chart-tag tag-amber">−29% Overhead</span>
+          </div>
+          <canvas id="chartOverhead" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">🔋 Energy Consumption (J)</div>
+            <span class="chart-tag tag-teal">−22% Energy</span>
+          </div>
+          <canvas id="chartEnergy" height="200"></canvas>
+        </div>
       </div>
-      MANET Research Lab — CS2708
-    </div>
-    <p class="footer-info">
-      Department of Computer Science &amp; Engineering · Anitha G · Elanthalir K · Harini G.P · Guide: Dr. Sugumaran V.R<br/>
-      Simulation Engine: NS-3 v3.40+ | Analysis: Python, pandas, matplotlib | Metrics: PDR, Delay, Overhead, Energy
-    </p>
-  </div>
-</footer>
+    </section>
+
+    <!-- ===== TOPOLOGY VISUALIZER ===== -->
+    <section class="topology-section" id="topology">
+      <div class="section-header">
+        <div>
+          <h2>🗺️ Network Topology Visualizer</h2>
+          <p>Interactive MANET node distribution with transmission range overlay</p>
+        </div>
+        <div class="topo-controls">
+          <button class="topo-btn active" id="topoStatic" onclick="setTopo('static',this)">Static</button>
+          <button class="topo-btn" id="topoDynamic" onclick="setTopo('dynamic',this)">Dynamic</button>
+          <button class="topo-btn" id="topoRoute" onclick="setTopo('route',this)">Show Routes</button>
+        </div>
+      </div>
+
+      <div class="topo-wrap">
+        <canvas id="topoCanvas" height="380"></canvas>
+        <div class="topo-stats">
+          <div class="tstat"><div class="tstat-num" id="t-nodes">50</div><div class="tstat-label">Active Nodes</div></div>
+          <div class="tstat"><div class="tstat-num" id="t-links">127</div><div class="tstat-label">Active Links</div></div>
+          <div class="tstat"><div class="tstat-num" id="t-routes">8</div><div class="tstat-label">Active Routes</div></div>
+          <div class="tstat"><div class="tstat-num" id="t-pdr">91.4%</div><div class="tstat-label">Live PDR</div></div>
+          <div class="tstat"><div class="tstat-num" id="t-energy">87%</div><div class="tstat-label">Avg Energy</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ALGORITHM COMPARISON ===== -->
+    <section class="algo-section" id="algorithm">
+      <div class="section-header">
+        <div>
+          <h2>⚙️ Algorithm Design</h2>
+          <p>Standard AODV vs Energy-Aware AODV — Key architectural differences</p>
+        </div>
+      </div>
+
+      <div class="algo-matrix-wrapper">
+        <div class="algo-matrix-card">
+          <table class="algo-matrix-table" aria-label="Standard AODV vs Energy-Aware AODV Comparison Matrix">
+            <thead>
+              <tr>
+                <th class="col-feature" scope="col">
+                  <div class="th-content">
+                    <span class="th-title">Feature / Comparison</span>
+                    <span class="th-subtitle">Protocol Dimension</span>
+                  </div>
+                </th>
+                <th class="col-standard" scope="col">
+                  <div class="th-content">
+                    <div class="th-algo-row">
+                      <span class="algo-pill-tag aodv-tag">STANDARD</span>
+                      <span class="th-algo-title">AODV Protocol</span>
+                    </div>
+                    <span class="th-subtitle">Baseline Reactive Routing</span>
+                  </div>
+                </th>
+                <th class="col-enhanced" scope="col">
+                  <div class="th-content">
+                    <div class="th-algo-row">
+                      <span class="algo-pill-tag eaodv-tag">ENHANCED</span>
+                      <span class="th-algo-title">eAODV — Energy-Aware AODV</span>
+                    </div>
+                    <span class="th-subtitle">Optimized Energy-Scored Routing</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="cell-feature" data-label="Feature">
+                  <span class="feature-label">Route Selection Metric</span>
+                </td>
+                <td class="cell-standard" data-label="Standard AODV">
+                  <div class="matrix-cell-content limitation">
+                    <span class="matrix-status-icon limitation" aria-hidden="true">✕</span>
+                    <span class="matrix-text">Route selection based on <strong>first reply</strong> (lowest latency)</span>
+                  </div>
+                </td>
+                <td class="cell-enhanced" data-label="Enhanced eAODV">
+                  <div class="matrix-cell-content improvement">
+                    <span class="matrix-status-icon improvement" aria-hidden="true">✓</span>
+                    <span class="matrix-text">Route selection via <strong>energy-weighted RREP scoring</strong></span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-feature" data-label="Feature">
+                  <span class="feature-label">Energy Awareness &amp; Modeling</span>
+                </td>
+                <td class="cell-standard" data-label="Standard AODV">
+                  <div class="matrix-cell-content limitation">
+                    <span class="matrix-status-icon limitation" aria-hidden="true">✕</span>
+                    <span class="matrix-text"><strong>No energy awareness</strong> — routes through dying nodes</span>
+                  </div>
+                </td>
+                <td class="cell-enhanced" data-label="Enhanced eAODV">
+                  <div class="matrix-cell-content improvement">
+                    <span class="matrix-status-icon improvement" aria-hidden="true">✓</span>
+                    <span class="matrix-text">Attaches <code>BasicEnergySource</code> model to each NS-3 node</span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-feature" data-label="Feature">
+                  <span class="feature-label">Node Selection &amp; Mobility</span>
+                </td>
+                <td class="cell-standard" data-label="Standard AODV">
+                  <div class="matrix-cell-content limitation">
+                    <span class="matrix-status-icon limitation" aria-hidden="true">✕</span>
+                    <span class="matrix-text">Frequent route breaks under high mobility → heavy RREQ flooding</span>
+                  </div>
+                </td>
+                <td class="cell-enhanced" data-label="Enhanced eAODV">
+                  <div class="matrix-cell-content improvement">
+                    <span class="matrix-status-icon improvement" aria-hidden="true">✓</span>
+                    <span class="matrix-text">Penalises low-battery next-hops; prefers energy-rich nodes</span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-feature" data-label="Feature">
+                  <span class="feature-label">Route Maintenance &amp; Repair</span>
+                </td>
+                <td class="cell-standard" data-label="Standard AODV">
+                  <div class="matrix-cell-content limitation">
+                    <span class="matrix-status-icon limitation" aria-hidden="true">✕</span>
+                    <span class="matrix-text">Re-discovery delay spikes when a route collapses</span>
+                  </div>
+                </td>
+                <td class="cell-enhanced" data-label="Enhanced eAODV">
+                  <div class="matrix-cell-content improvement">
+                    <span class="matrix-status-icon improvement" aria-hidden="true">✓</span>
+                    <span class="matrix-text">Energy threshold triggers proactive local route repair</span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-feature" data-label="Feature">
+                  <span class="feature-label">Battery Load &amp; Network Lifetime</span>
+                </td>
+                <td class="cell-standard" data-label="Standard AODV">
+                  <div class="matrix-cell-content limitation">
+                    <span class="matrix-status-icon limitation" aria-hidden="true">✕</span>
+                    <span class="matrix-text">Battery drain concentrated on few hub nodes</span>
+                  </div>
+                </td>
+                <td class="cell-enhanced" data-label="Enhanced eAODV">
+                  <div class="matrix-cell-content improvement">
+                    <span class="matrix-status-icon improvement" aria-hidden="true">✓</span>
+                    <span class="matrix-text">Balanced battery load extends network lifetime by ~22%</span>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="cell-feature" data-label="Feature">
+                  <span class="feature-label">High-Speed Routing Overhead</span>
+                </td>
+                <td class="cell-standard" data-label="Standard AODV">
+                  <div class="matrix-cell-content limitation">
+                    <span class="matrix-status-icon limitation" aria-hidden="true">✕</span>
+                    <span class="matrix-text">High routing overhead at speeds &gt; 10 m/s</span>
+                  </div>
+                </td>
+                <td class="cell-enhanced" data-label="Enhanced eAODV">
+                  <div class="matrix-cell-content improvement">
+                    <span class="matrix-status-icon improvement" aria-hidden="true">✓</span>
+                    <span class="matrix-text">Lower re-discovery cost → reduced overhead at all speeds</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="brand-icon small">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/>
+              <path d="M7 5h10M7 19h4M5 7v3M19 7v3M17 12l-4 7M7 12l4 7"/>
+            </svg>
+          </div>
+          <span>MANET Research Lab — CS2708</span>
+        </div>
+        <p class="footer-info">
+          Department of Computer Science &amp; Engineering · Anitha G · Elanthalir K · Harini G.P · Guide: Dr. Sugumaran V.R<br/>
+          Simulation Engine: NS-3 v3.40+ | Analysis: Python, pandas, matplotlib | Metrics: PDR, Delay, Overhead, Energy
+        </p>
+      </div>
+    </footer>
+
+  </main>
+</div>
 
 <script src="main.js"></script>
 </body>

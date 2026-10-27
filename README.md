@@ -1,13 +1,11 @@
-# MANET Routing Research Dashboard
+# MANET Routing Research Dashboard (Full-Stack Edition)
 ### Reliable and Efficient Routing in Highly Dynamic MANETs — CS2708
 
-> **Energy-Aware AODV (eAODV)** vs Standard AODV — Live simulation dashboard with performance analytics
-
-![Dashboard Preview](dashboard/preview.png)
+> **Energy-Aware AODV (eAODV)** vs Standard AODV — Decoupled React.js Frontend, Python FastAPI Backend, and NS-3 Simulation Engine
 
 ---
 
-## 👥 Team
+## 👥 Research Team
 | Name | Role |
 |---|---|
 | Anitha G | Developer & Researcher |
@@ -15,132 +13,157 @@
 | Harini G.P | Developer & Researcher |
 | **Guide: Dr. Sugumaran V.R** | Project Supervisor |
 
-**Batch:** CS2708
+**Batch:** CS2708 | Department of Computer Science & Engineering
 
 ---
 
 ## 📌 Project Overview
 
-This project designs and evaluates an **Energy-Aware variant of AODV** (eAODV) routing protocol for Mobile Ad-hoc Networks (MANETs). Standard AODV breaks down under high node mobility — links break often, causing heavy re-discovery overhead and battery drain. eAODV fixes this by:
+This project designs, simulates, and evaluates an **Energy-Aware variant of AODV (eAODV)** routing protocol for Mobile Ad-hoc Networks (MANETs). Standard AODV breaks down under high mobility — frequent link breakages trigger heavy control packet floods and battery depletion. eAODV enhances performance by:
 
-- Scoring route replies using **remaining node energy**
-- Avoiding routing through **low-battery nodes**
-- Triggering **proactive local repair** before a route fails
-- Balancing energy load to extend **network lifetime by ~22%**
-
-Performance is validated via **NS-3 v3.40+** simulation across multiple scenarios.
+- Factoring **residual node energy** into route reply (RREP) weighting
+- Penalizing low-battery intermediate relay nodes
+- Balancing power load across the ad-hoc topology
+- Validating performance via **NS-3 v3.41** simulation across mobility speeds (1–25 m/s) and node densities (10–100 nodes).
 
 ---
 
-## 📊 Key Results
+## 🏗️ Architecture & Decoupling
 
-| Metric | AODV (Baseline) | eAODV (Enhanced) | Improvement |
-|---|---|---|---|
-| Packet Delivery Ratio | 73.2% | 91.4% | **▲ +18.2%** |
-| End-to-End Delay | 68 ms | 42 ms | **▼ −38.5%** |
-| Routing Overhead | 0.44 | 0.31 | **▼ −29.1%** |
-| Energy Consumed (avg/node) | 1.6 J | 1.24 J | **▼ −22.3%** |
+The project supports two independent execution options:
 
----
-
-## 🚀 Running the Demo Dashboard
-
-No installation needed — just open in any browser:
-
-```
-dashboard/index.html  →  double-click to open
-```
-
-**Features:**
-- 🔬 Live animated MANET simulation canvas
-- 📊 Interactive Chart.js performance graphs (PDR, Delay, Overhead, Energy)
-- 🗺️ Network topology visualizer (Static / Dynamic / Route modes)
-- ⚙️ Algorithm comparison (AODV vs eAODV)
-- 🎛️ Configurable node count, speed, and protocol
+1. **Option A: Full-Stack Integrated React + FastAPI + NS-3 (Recommended)**
+   - **Frontend:** React 18, Vite 5, TypeScript, Tailwind CSS, react-chartjs-2
+   - **Backend:** Python 3.10+, FastAPI, Uvicorn, Pydantic, aiosqlite, WebSockets
+   - **Simulation:** C++ NS-3 scripts (`manet-baseline.cc`, `manet-eaodv.cc`) executed via WSL2 Ubuntu 22.04 LTS
+2. **Option B: Original Standalone HTML/CSS/JS Demo**
+   - Preserved in `dashboard/index.html` (zero dependencies, runs in any browser).
 
 ---
 
-## 🔧 Running the NS-3 Simulation
+## 🚀 Running the Full-Stack Application
 
-### Prerequisites (Linux / WSL2 on Windows)
-
+### 1. Start the FastAPI Backend
+In a terminal:
 ```bash
-# Install WSL2 (Windows only — run in PowerShell as Admin)
-wsl --install -d Ubuntu-22.04
+cd backend
 
-# Inside Ubuntu — install dependencies
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y g++ python3 python3-pip git cmake ninja-build libgtk-3-dev
-pip3 install pandas matplotlib numpy
+# Create & activate Python virtual environment (Windows PowerShell)
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start backend server
+uvicorn app.main:app --reload --port 8000
 ```
+- API Base URL: `http://localhost:8000`
+- Interactive Swagger Docs: `http://localhost:8000/docs`
+- Health Endpoint: `http://localhost:8000/api/health`
 
-### Install NS-3
-
+### 2. Start the React Frontend
+In a separate terminal:
 ```bash
-git clone https://gitlab.com/nsnam/ns-3-dev.git
-cd ns-3-dev
-./ns3 configure --enable-examples --enable-tests
-./ns3 build       # takes ~15–20 minutes first time
-./ns3 run "aodv"  # verify installation
+cd frontend
+
+# Install Node dependencies
+npm install
+
+# Start Vite dev server
+npm run dev
 ```
+- Frontend URL: `http://localhost:5173`
+- Environment Config: `frontend/.env` (`VITE_API_BASE_URL=http://localhost:8000`)
 
-### Run Baseline Simulation
+---
 
+## 🔬 NS-3 C++ Simulation Engine Setup
+
+The backend uses NS-3 v3.41 installed in WSL2 Ubuntu. The simulation scripts are provided in `simulation/scratch/`:
+
+- `simulation/scratch/manet-baseline.cc`: Baseline standard AODV protocol simulation with FlowMonitor and BasicEnergySource.
+- `simulation/scratch/manet-eaodv.cc`: Energy-Aware AODV protocol simulation with residual battery weighting.
+
+### Build and Test NS-3 Manually in WSL2:
 ```bash
-cp ../manet-baseline.cc scratch/
-./ns3 run "manet-baseline"
-# Output: results/baseline_<nodes>_<speed>.xml
-```
+# Inside WSL Ubuntu terminal:
+cd /home/kumar/MANET/ns-3/ns-allinone-3.41/ns-3.41
 
-### Run Full Sweep
+# Run baseline simulation:
+./ns3 run "scratch/manet-baseline --nNodes=20 --simulationTime=10"
 
-```bash
-python3 sweep.py     # runs all node/speed combos for both protocols
-python3 analyze.py   # parses XML → generates comparison graphs
-# Graphs saved to: results/graphs/comparison_*.png
+# Run enhanced eAODV simulation:
+./ns3 run "scratch/manet-eaodv --nNodes=20 --simulationTime=10"
 ```
 
 ---
 
-## 📁 Project Structure
+## 🧪 Automated Test Suite
+
+Run backend unit and end-to-end integration tests:
+```bash
+# From workspace root:
+$env:PYTHONPATH='backend'
+.\.venv\Scripts\pytest.exe backend\tests -v
+```
+Tests cover:
+- Backend health and environment verification (`test_health_check`)
+- Configuration ranges and defaults (`test_simulation_config`)
+- Asynchronous demo simulation lifecycle (`test_demo_simulation_lifecycle`)
+- FlowMonitor XML and energy CSV parsing accuracy (`test_xml_and_energy_parser`)
+- Genuine end-to-end NS-3 simulation execution via WSL2 (`test_real_ns3_simulation_execution`)
+
+---
+
+## 📁 Repository Directory Structure
 
 ```
-manet_reliable/
-├── dashboard/              # 🖥️  Web demo dashboard (open index.html)
-│   ├── index.html          # Main dashboard page
-│   ├── style.css           # Premium dark theme styles
-│   └── main.js             # Canvas animations + Chart.js logic
-├── ns-3-dev/               # NS-3 simulation engine
+MANET/
+├── backend/                             # Python FastAPI Backend
+│   ├── app/
+│   │   ├── api/                         # REST & WebSocket endpoints
+│   │   ├── core/                        # Configuration settings
+│   │   ├── schemas/                     # Pydantic data schemas
+│   │   ├── services/                    # Process management, DB, and XML parsing
+│   │   └── main.py                      # FastAPI entrypoint
+│   ├── tests/                           # Pytest automated test suite
+│   ├── database.sqlite3                 # Persistent simulation history
+│   └── requirements.txt                 # Backend dependencies
+│
+├── frontend/                            # React.js + Vite + TypeScript Frontend
+│   ├── src/
+│   │   ├── components/                  # Navbar, Canvas, Charts, Topology, Matrix
+│   │   ├── services/                    # API & WebSocket client
+│   │   ├── types/                       # TypeScript definitions
+│   │   ├── App.tsx                      # Root application layout
+│   │   ├── main.tsx                     # React DOM entrypoint
+│   │   └── index.css                    # Tailwind CSS directives & tokens
+│   ├── package.json
+│   ├── tailwind.config.js
+│   └── vite.config.ts
+│
+├── simulation/                          # C++ NS-3 Simulation Workspace
 │   └── scratch/
-│       ├── manet-baseline.cc   # Standard AODV simulation
-│       └── manet-eaodv.cc      # Energy-Aware AODV simulation
-├── results/                # Simulation output XML files
-│   └── graphs/             # Generated comparison PNG graphs
-├── MANET_Project_Roadmap.md
-├── Antigravity_Prompt_Sequence.md
+│       ├── manet-baseline.cc            # Standard AODV simulation
+│       └── manet-eaodv.cc               # Energy-Aware AODV simulation
+│
+├── results/                             # Simulation outputs (XML, CSV)
+├── docs/                                # Architecture & API Specifications
+│   ├── ARCHITECTURE.md
+│   └── API_SPECIFICATION.md
+│
+├── dashboard/                           # Original Vanilla HTML/CSS/JS Demo (Preserved)
+│   ├── index.html
+│   ├── style.css
+│   └── main.js
+│
 └── README.md
 ```
 
 ---
 
-## 🛠️ Tech Stack
-
-| Purpose | Tool |
-|---|---|
-| Network Simulation | NS-3 v3.40+ |
-| Protocol Language | C++ |
-| Analysis & Graphs | Python 3, pandas, matplotlib |
-| Demo Dashboard | HTML5, CSS3, Vanilla JS, Chart.js |
-| Version Control | Git / GitHub |
-
----
-
-## 📚 References
-
-1. Perkins, C. E., & Royer, E. M. (1999). Ad-hoc On-Demand Distance Vector Routing. *IEEE WMCSA*
-2. NS-3 Official Tutorial — [nsnam.org/docs/tutorial](https://www.nsnam.org/docs/tutorial/html/)
-3. NS-3 AODV Module — `src/aodv/model/aodv-routing-protocol.cc`
-
----
-
-*Department of Computer Science & Engineering — Final Year Project 2024–25*
+## 📜 References
+1. Perkins, C. E., & Royer, E. M. (1999). Ad-hoc On-Demand Distance Vector Routing. *IEEE WMCSA*.
+2. NS-3 Network Simulator Documentation — [nsnam.org](https://www.nsnam.org/docs/release/3.41/).
+3. RFC 3561 — Ad hoc On-Demand Distance Vector (AODV) Routing.

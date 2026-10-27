@@ -9,7 +9,7 @@
 // ───────────────────────────────────────────────
 (function initParticles() {
   const container = document.getElementById('particles');
-  const colors = ['#6c63ff','#00d4aa','#ffd166','#ff6b6b','#00b4d8'];
+  const colors = ['#2864E8', '#5D8DF0', '#10B981', '#F59E0B', '#93C5FD'];
   for (let i = 0; i < 35; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
@@ -108,9 +108,9 @@ if (kpiSection) counterObserver.observe(kpiSection);
         const dy = nodes[i].y - nodes[j].y;
         const dist = Math.sqrt(dx*dx + dy*dy);
         if (dist < 120) {
-          const alpha = (1 - dist / 120) * 0.4;
-          ctx.strokeStyle = `rgba(108,99,255,${alpha})`;
-          ctx.lineWidth = 1;
+          const alpha = (1 - dist / 120) * 0.45;
+          ctx.strokeStyle = `rgba(40, 100, 232, ${alpha * 0.45})`;
+          ctx.lineWidth = 1.2;
           ctx.beginPath();
           ctx.moveTo(nodes[i].x, nodes[i].y);
           ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -120,13 +120,13 @@ if (kpiSection) counterObserver.observe(kpiSection);
     }
     // Draw nodes
     nodes.forEach(n => {
-      const color = n.energy > 0.5 ? '#00d4aa' : '#ff6b6b';
-      const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius * 3);
-      glow.addColorStop(0, color.replace(')', ',0.4)').replace('rgb', 'rgba').replace('#00d4aa','rgba(0,212,170,0.4)').replace('#ff6b6b','rgba(255,107,107,0.3)'));
+      const color = n.energy > 0.5 ? '#10B981' : '#EF4444';
+      const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.radius * 2.8);
+      glow.addColorStop(0, n.energy > 0.5 ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.3)');
       glow.addColorStop(1, 'transparent');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(n.x, n.y, n.radius * 3, 0, Math.PI * 2);
+      ctx.arc(n.x, n.y, n.radius * 2.8, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = color;
@@ -212,7 +212,7 @@ function simFrame() {
   ctx.clearRect(0, 0, W, H);
 
   // Grid dots
-  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  ctx.fillStyle = 'rgba(36, 50, 74, 0.06)';
   for (let gx = 30; gx < W; gx += 40)
     for (let gy = 30; gy < H; gy += 40) {
       ctx.beginPath(); ctx.arc(gx, gy, 1, 0, Math.PI * 2); ctx.fill();
@@ -225,9 +225,9 @@ function simFrame() {
     for (let j = i + 1; j < simNodes.length; j++) {
       const d = toDist(simNodes[i], simNodes[j]);
       if (d < 130) {
-        const alpha = (1 - d / 130) * 0.15;
-        ctx.strokeStyle = `rgba(108,99,255,${alpha})`;
-        ctx.lineWidth = 0.8;
+        const alpha = (1 - d / 130) * 0.22;
+        ctx.strokeStyle = `rgba(40, 100, 232, ${alpha})`;
+        ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(simNodes[i].x, simNodes[i].y);
         ctx.lineTo(simNodes[j].x, simNodes[j].y);
@@ -240,8 +240,8 @@ function simFrame() {
   simPackets.forEach(pkt => {
     for (let k = 0; k < pkt.route.length - 1; k++) {
       const a = pkt.route[k], b = pkt.route[k + 1];
-      ctx.strokeStyle = 'rgba(108,99,255,0.5)';
-      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(40, 100, 232, 0.65)';
+      ctx.lineWidth = 2.2;
       ctx.setLineDash([6, 4]);
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
@@ -253,27 +253,27 @@ function simFrame() {
 
   // Draw nodes
   simNodes.forEach(n => {
-    const color = n.isSource ? '#6c63ff' : n.isDest ? '#ffd166' : n.energy > 0.35 ? '#00d4aa' : '#ff6b6b';
-    const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 18);
-    glow.addColorStop(0, color + '55');
+    const color = n.isSource ? '#2864E8' : n.isDest ? '#F59E0B' : n.energy > 0.35 ? '#10B981' : '#EF4444';
+    const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, 16);
+    glow.addColorStop(0, color === '#2864E8' ? 'rgba(40, 100, 232, 0.3)' : color === '#10B981' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)');
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(n.x, n.y, 18, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(n.x, n.y, 16, 0, Math.PI * 2); ctx.fill();
 
     ctx.fillStyle = color;
-    ctx.beginPath(); ctx.arc(n.x, n.y, 5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(n.x, n.y, 5.5, 0, Math.PI * 2); ctx.fill();
 
     // Energy ring
-    ctx.strokeStyle = color + '88';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = color + 'aa';
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
-    ctx.arc(n.x, n.y, 8, 0, Math.PI * 2 * n.energy);
+    ctx.arc(n.x, n.y, 8.5, 0, Math.PI * 2 * n.energy);
     ctx.stroke();
 
     // Label
     if (n.isSource || n.isDest) {
-      ctx.fillStyle = color;
-      ctx.font = 'bold 10px Outfit';
+      ctx.fillStyle = '#24324A';
+      ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(n.isSource ? 'SRC' : 'DST', n.x, n.y - 14);
     }
@@ -297,13 +297,13 @@ function simFrame() {
     const a = pkt.route[seg], b = pkt.route[seg + 1];
     const px = a.x + (b.x - a.x) * t;
     const py = a.y + (b.y - a.y) * t;
-    const glow2 = ctx.createRadialGradient(px, py, 0, px, py, 10);
-    glow2.addColorStop(0, '#ffd166aa');
+    const glow2 = ctx.createRadialGradient(px, py, 0, px, py, 12);
+    glow2.addColorStop(0, 'rgba(40, 100, 232, 0.4)');
     glow2.addColorStop(1, 'transparent');
     ctx.fillStyle = glow2;
-    ctx.beginPath(); ctx.arc(px, py, 10, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#ffd166';
-    ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(px, py, 12, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#2864E8';
+    ctx.beginPath(); ctx.arc(px, py, 4.5, 0, Math.PI * 2); ctx.fill();
   });
 
   // Spawn new packets every 2 seconds
@@ -406,27 +406,43 @@ function setProto(proto) {
 // ───────────────────────────────────────────────
 // 6. CHART.JS CHARTS
 // ───────────────────────────────────────────────
-Chart.defaults.color = '#8892a4';
-Chart.defaults.font.family = 'Outfit';
+Chart.defaults.color = '#77839A';
+Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
 
 const CHART_OPTS = (title) => ({
   responsive: true,
   maintainAspectRatio: true,
   animation: { duration: 900, easing: 'easeInOutQuart' },
   plugins: {
-    legend: { labels: { boxWidth: 12, padding: 16, font: { size: 11 } } },
+    legend: {
+      labels: {
+        boxWidth: 12,
+        padding: 16,
+        font: { size: 12, family: "'Plus Jakarta Sans', sans-serif", weight: '600' },
+        color: '#24324A'
+      }
+    },
     tooltip: {
-      backgroundColor: 'rgba(8,11,20,0.9)',
-      borderColor: 'rgba(255,255,255,0.1)',
+      backgroundColor: '#24324A',
+      borderColor: '#E8ECF2',
       borderWidth: 1,
       padding: 12,
-      titleFont: { family: 'Outfit', size: 12 },
-      bodyFont: { family: 'Outfit', size: 12 },
+      cornerRadius: 10,
+      titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12, weight: '600' },
+      bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 12 },
+      titleColor: '#FFFFFF',
+      bodyColor: '#F1F5F9',
     }
   },
   scales: {
-    x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { size: 11 } } },
-    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { font: { size: 11 } } },
+    x: {
+      grid: { color: 'rgba(232, 236, 242, 0.8)' },
+      ticks: { color: '#77839A', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } }
+    },
+    y: {
+      grid: { color: 'rgba(232, 236, 242, 0.8)' },
+      ticks: { color: '#77839A', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } }
+    },
   }
 });
 
@@ -462,10 +478,12 @@ function makeDataset(label, data, color, fill = false) {
     label,
     data,
     borderColor: color,
-    backgroundColor: fill ? color + '22' : color + '33',
+    backgroundColor: fill ? (color === '#2864E8' ? 'rgba(40, 100, 232, 0.08)' : 'rgba(148, 163, 184, 0.08)') : 'transparent',
     pointBackgroundColor: color,
-    pointRadius: 4,
-    pointHoverRadius: 6,
+    pointBorderColor: '#FFFFFF',
+    pointBorderWidth: 2,
+    pointRadius: 4.5,
+    pointHoverRadius: 6.5,
     borderWidth: 2.5,
     fill,
     tension: 0.35,
@@ -476,10 +494,10 @@ let charts = {};
 function buildCharts(scenKey) {
   const d = SCENARIOS[scenKey];
   const chartDefs = [
-    { id: 'chartPDR',      key: 'pdr',      yLabel: 'PDR (%)',        cA: '#6c63ff', cB: '#00d4aa' },
-    { id: 'chartDelay',    key: 'delay',    yLabel: 'Delay (ms)',     cA: '#ff6b6b', cB: '#00b4d8' },
-    { id: 'chartOverhead', key: 'overhead', yLabel: 'Overhead Ratio', cA: '#ffd166', cB: '#ff9f43' },
-    { id: 'chartEnergy',   key: 'energy',   yLabel: 'Energy (J)',     cA: '#ff6b6b', cB: '#00d4aa' },
+    { id: 'chartPDR',      key: 'pdr',      yLabel: 'PDR (%)',        cA: '#94A3B8', cB: '#2864E8' },
+    { id: 'chartDelay',    key: 'delay',    yLabel: 'Delay (ms)',     cA: '#94A3B8', cB: '#2864E8' },
+    { id: 'chartOverhead', key: 'overhead', yLabel: 'Overhead Ratio', cA: '#94A3B8', cB: '#2864E8' },
+    { id: 'chartEnergy',   key: 'energy',   yLabel: 'Energy (J)',     cA: '#94A3B8', cB: '#2864E8' },
   ];
   chartDefs.forEach(({ id, key, yLabel, cA, cB }) => {
     if (charts[id]) { charts[id].destroy(); }
@@ -497,14 +515,14 @@ function buildCharts(scenKey) {
         ...CHART_OPTS(yLabel),
         scales: {
           x: {
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            ticks: { font: { size: 11 } },
-            title: { display: true, text: d.xTitle, color: '#8892a4', font: { size: 11 } }
+            grid: { color: 'rgba(232, 236, 242, 0.8)' },
+            ticks: { color: '#77839A', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } },
+            title: { display: true, text: d.xTitle, color: '#77839A', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' } }
           },
           y: {
-            grid: { color: 'rgba(255,255,255,0.05)' },
-            ticks: { font: { size: 11 } },
-            title: { display: true, text: yLabel, color: '#8892a4', font: { size: 11 } }
+            grid: { color: 'rgba(232, 236, 242, 0.8)' },
+            ticks: { color: '#77839A', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11 } },
+            title: { display: true, text: yLabel, color: '#77839A', font: { family: "'Plus Jakarta Sans', sans-serif", size: 11, weight: '600' } }
           }
         }
       }
@@ -587,7 +605,7 @@ function drawTopo() {
   ctx.clearRect(0, 0, W, H);
 
   // Bg dots
-  ctx.fillStyle = 'rgba(255,255,255,0.025)';
+  ctx.fillStyle = 'rgba(36, 50, 74, 0.05)';
   for (let gx = 30; gx < W; gx += 50)
     for (let gy = 30; gy < H; gy += 50) {
       ctx.beginPath(); ctx.arc(gx, gy, 1.5, 0, Math.PI * 2); ctx.fill();
@@ -595,7 +613,7 @@ function drawTopo() {
 
   // Transmission circles (range) for source
   const src = topoNodes[0];
-  ctx.strokeStyle = 'rgba(108,99,255,0.08)';
+  ctx.strokeStyle = 'rgba(40, 100, 232, 0.16)';
   ctx.lineWidth = 1;
   ctx.setLineDash([4, 6]);
   ctx.beginPath(); ctx.arc(src.x, src.y, 130, 0, Math.PI * 2); ctx.stroke();
@@ -607,8 +625,8 @@ function drawTopo() {
       const a = topoNodes[i], b = topoNodes[j];
       const d = toDist(a, b);
       if (d > 130) return;
-      ctx.strokeStyle = `rgba(108,99,255,${(1 - d / 130) * 0.12})`;
-      ctx.lineWidth = 0.8;
+      ctx.strokeStyle = `rgba(40, 100, 232, ${(1 - d / 130) * 0.18})`;
+      ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     });
   }
@@ -618,7 +636,7 @@ function drawTopo() {
     topoRoutes.forEach(route => {
       for (let k = 0; k < route.length - 1; k++) {
         const a = route[k], b = route[k + 1];
-        ctx.strokeStyle = 'rgba(0,212,170,0.5)';
+        ctx.strokeStyle = 'rgba(40, 100, 232, 0.75)';
         ctx.lineWidth = 2.5;
         ctx.setLineDash([8, 4]);
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
@@ -630,20 +648,20 @@ function drawTopo() {
   // Nodes
   topoNodes.forEach(n => {
     const onRoute = topoMode === 'route' && topoRoutes[0].includes(n);
-    const color = n.isSource ? '#6c63ff' : n.isDest ? '#ffd166' : onRoute ? '#00d4aa' : n.energy > 0.4 ? '#00d4aa' : '#ff6b6b';
+    const color = n.isSource ? '#2864E8' : n.isDest ? '#F59E0B' : onRoute ? '#2864E8' : n.energy > 0.4 ? '#10B981' : '#EF4444';
     const r = n.isSource || n.isDest ? 7 : onRoute ? 6 : 4.5;
-    const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 3.5);
-    glow.addColorStop(0, color + '44');
+    const glow = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 3);
+    glow.addColorStop(0, color === '#2864E8' ? 'rgba(40, 100, 232, 0.35)' : 'rgba(16, 185, 129, 0.35)');
     glow.addColorStop(1, 'transparent');
     ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(n.x, n.y, r * 3.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2); ctx.fill();
 
     ctx.fillStyle = color;
     ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI * 2); ctx.fill();
 
     if (n.isSource || n.isDest) {
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 9px Outfit';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 9px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(n.isSource ? 'S' : 'D', n.x, n.y - r - 6);
     }
@@ -705,3 +723,166 @@ window.addEventListener('resize', () => {
     drawTopo();
   }
 });
+
+// ==========================================================================
+// NOTIFICATION POPOVER DROPDOWN (OPTION 1)
+// ==========================================================================
+function escapeNotifHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function updateNotifDropdown() {
+  const simLog = document.getElementById('simLog');
+  const list = document.getElementById('notifList');
+  const countPill = document.getElementById('notifCountPill');
+  const statusBadge = document.getElementById('notifStatusBadge');
+  const statusText = document.getElementById('notifStatusText');
+  if (!list) return;
+
+  // Mirror NS-3 readiness and active simulation status
+  if (statusBadge && statusText) {
+    if (typeof simRunning !== 'undefined' && simRunning) {
+      statusBadge.className = 'notif-status-badge running';
+      statusText.textContent = `Sim Active (${typeof currentProto !== 'undefined' ? currentProto : 'eAODV'})`;
+    } else {
+      statusBadge.className = 'notif-status-badge';
+      statusText.textContent = 'NS-3 Ready';
+    }
+  }
+
+  if (!simLog) return;
+  const logLines = Array.from(simLog.querySelectorAll('.log-line'));
+  if (logLines.length === 0) {
+    list.innerHTML = '<div class="notif-empty-state">No simulation events recorded yet.</div>';
+    if (countPill) countPill.textContent = '0 Logs';
+    return;
+  }
+
+  // Display up to 5 most recent actual logs in reverse chronological order
+  const recent = logLines.slice(-5).reverse();
+  if (countPill) countPill.textContent = `${logLines.length} Logs`;
+
+  list.innerHTML = recent.map((line, idx) => {
+    const rawText = line.textContent.trim();
+    const match = rawText.match(/^\[(.*?)\]\s*(.*)$/);
+    const tag = match ? match[1] : (rawText.startsWith('[') ? rawText.slice(1, Math.max(1, rawText.indexOf(']'))) : 'INFO');
+    const body = match ? match[2] : rawText;
+
+    let icon = 'ℹ️';
+    let tagClass = 'notif-tag-info';
+
+    if (tag.includes('WARN') || tag.includes('STOP')) {
+      icon = '⚠️';
+      tagClass = 'notif-tag-warn';
+    } else if (tag.includes('DATA') || tag === 'eAODV') {
+      icon = '⚡';
+      tagClass = 'notif-tag-success';
+    } else if (tag.includes('RREQ') || tag.includes('RREP') || tag === 'AODV') {
+      icon = '⇄';
+      tagClass = 'notif-tag-route';
+    } else if (tag.includes('READY')) {
+      icon = '▶';
+      tagClass = 'notif-tag-ready';
+    }
+
+    const orderLabel = idx === 0 ? 'Latest' : `#${logLines.length - idx}`;
+
+    return `
+      <div class="notif-item">
+        <div class="notif-item-icon-box ${tagClass}">${icon}</div>
+        <div class="notif-item-content">
+          <div class="notif-item-top">
+            <span class="notif-item-tag ${tagClass}">[${escapeNotifHtml(tag)}]</span>
+            <span class="notif-item-order">${orderLabel}</span>
+          </div>
+          <div class="notif-item-text">${escapeNotifHtml(body)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleNotifDropdown(eventOrForce) {
+  if (eventOrForce && typeof eventOrForce.stopPropagation === 'function') {
+    eventOrForce.stopPropagation();
+  }
+  const btn = document.getElementById('notifBellBtn');
+  const dropdown = document.getElementById('notifDropdown');
+  if (!dropdown || !btn) return;
+
+  const forceOpen = typeof eventOrForce === 'boolean' ? eventOrForce : undefined;
+  const willOpen = typeof forceOpen === 'boolean' ? forceOpen : !dropdown.classList.contains('open');
+  if (willOpen) {
+    updateNotifDropdown();
+    dropdown.classList.add('open');
+    dropdown.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
+  } else {
+    dropdown.classList.remove('open');
+    dropdown.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+function viewConsoleLogsFromNotif(event) {
+  if (event && typeof event.stopPropagation === 'function') {
+    event.stopPropagation();
+  }
+  toggleNotifDropdown(false);
+  const simLog = document.getElementById('simLog');
+  if (simLog) {
+    simLog.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    simLog.classList.remove('highlight-pulse');
+    void simLog.offsetWidth;
+    simLog.classList.add('highlight-pulse');
+    setTimeout(() => {
+      simLog.classList.remove('highlight-pulse');
+    }, 1600);
+  }
+}
+
+function initNotifDropdown() {
+  // Live observer so open popover refreshes as logs are generated
+  const simLogTarget = document.getElementById('simLog');
+  if (simLogTarget && window.MutationObserver) {
+    const observer = new MutationObserver(() => {
+      const dropdown = document.getElementById('notifDropdown');
+      if (dropdown && dropdown.classList.contains('open')) {
+        updateNotifDropdown();
+      }
+    });
+    observer.observe(simLogTarget, { childList: true });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initNotifDropdown);
+} else {
+  initNotifDropdown();
+}
+
+// Close when clicking outside
+document.addEventListener('click', (e) => {
+  const wrapper = document.querySelector('.notif-wrapper');
+  if (wrapper && !wrapper.contains(e.target)) {
+    toggleNotifDropdown(false);
+  }
+});
+
+// Close on Escape key & return focus
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const dropdown = document.getElementById('notifDropdown');
+    if (dropdown && dropdown.classList.contains('open')) {
+      toggleNotifDropdown(false);
+      const btn = document.getElementById('notifBellBtn');
+      if (btn) btn.focus();
+    }
+  }
+});
+

@@ -32,9 +32,18 @@ desktop.ini
 *.swo
 *~
 
+# Frontend dependencies & build
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# SQLite databases
+*.sqlite3
+
 # Logs
 *.log
 
-# Markdown docs (exclude README.md)
+# Markdown docs (preserve README.md and docs/*.md)
 *.md
 !README.md
+!docs/*.md
