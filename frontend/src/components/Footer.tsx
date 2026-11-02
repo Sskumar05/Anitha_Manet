@@ -3,7 +3,7 @@ import { Network } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="px-6 sm:px-9 py-8 bg-slate-50 border-t border-slate-200/80 text-xs text-navy-500">
+    <footer className="px-6 sm:px-10 py-8 bg-slate-50 border-t border-slate-200/80 text-xs text-navy-500 w-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-primary text-white flex items-center justify-center">

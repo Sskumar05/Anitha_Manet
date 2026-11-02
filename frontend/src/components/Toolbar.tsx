@@ -1,47 +1,84 @@
 import React from 'react';
-import { Filter, SlidersHorizontal, HelpCircle, LayoutGrid } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Filter, SlidersHorizontal, HelpCircle, LayoutGrid, ChevronDown, Search } from 'lucide-react';
 
 interface ToolbarProps {
-  onScrollTo: (id: string) => void;
+  onScrollTo?: (id: string) => void;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({ onScrollTo }) => {
+  const navigate = useNavigate();
+
+  const handleNav = (path: string, id: string) => {
+    navigate(path);
+    if (onScrollTo) {
+      onScrollTo(id);
+    }
+  };
+
   return (
-    <div className="px-6 sm:px-9 pb-5 flex flex-wrap items-center justify-between gap-3 text-xs">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="px-6 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-slate-100 bg-[#FAFAFD]">
+      {/* Left: Active Filters & Dropdown Pills matching FINNOVA */}
+      <div className="flex flex-wrap items-center gap-2.5">
+        {/* Active Filter Pill */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 text-white font-bold text-xs shadow-2xs">
+          <span>Active Protocol</span>
+          <span className="w-5 h-5 rounded-full bg-[#635BFF] text-white flex items-center justify-center text-[10px] font-black">
+            2
+          </span>
+        </div>
+
+        {/* Protocol Selector Pill */}
         <button
-          onClick={() => onScrollTo('simulation')}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200/80 text-navy-700 font-semibold border border-slate-200 transition-colors"
+          onClick={() => handleNav('/analysis', 'analysis')}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-semibold border border-slate-200/80 transition-all shadow-2xs"
         >
-          <Filter className="w-3.5 h-3.5" />
-          <span>Filter Parameters</span>
+          <span>eAODV vs AODV</span>
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
         </button>
 
+        {/* Node Count Pill */}
         <button
-          onClick={() => onScrollTo('analysis')}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200/80 text-navy-700 font-semibold border border-slate-200 transition-colors"
+          onClick={() => handleNav('/simulation', 'simulation')}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-semibold border border-slate-200/80 transition-all shadow-2xs"
         >
-          <SlidersHorizontal className="w-3.5 h-3.5" />
-          <span>eAODV vs AODV</span>
+          <span>Topology: 50 Nodes</span>
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+        </button>
+
+        {/* Mobility Pill */}
+        <button
+          onClick={() => handleNav('/simulation', 'simulation')}
+          className="hidden md:flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-semibold border border-slate-200/80 transition-all shadow-2xs"
+        >
+          <span>Speed: 10 m/s RWP</span>
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
         </button>
       </div>
 
-      <div className="flex items-center gap-2">
+      {/* Right: Quick Navigation Pills & Search Bar matching FINNOVA */}
+      <div className="flex flex-wrap items-center gap-2">
         <button
-          onClick={() => onScrollTo('algorithm')}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200/80 text-navy-700 font-semibold border border-slate-200 transition-colors"
+          onClick={() => handleNav('/topology', 'topology')}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-semibold border border-slate-200/80 transition-all shadow-2xs"
         >
-          <HelpCircle className="w-3.5 h-3.5" />
-          <span>Algorithm Support</span>
+          <LayoutGrid className="w-3.5 h-3.5 text-purple-600" />
+          <span>Topology Layout</span>
         </button>
 
         <button
-          onClick={() => onScrollTo('topology')}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200/80 text-navy-700 font-semibold border border-slate-200 transition-colors"
+          onClick={() => handleNav('/algorithm', 'algorithm')}
+          className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-semibold border border-slate-200/80 transition-all shadow-2xs"
         >
-          <LayoutGrid className="w-3.5 h-3.5" />
-          <span>Topology Layout</span>
+          <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
+          <span>Cost Model</span>
         </button>
+
+        {/* Search Input Pill */}
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200/80 text-slate-400 shadow-2xs">
+          <Search className="w-3.5 h-3.5 text-slate-400" />
+          <span className="text-slate-400 font-normal pr-2">Search run ID...</span>
+        </div>
       </div>
     </div>
   );

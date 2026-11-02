@@ -21,7 +21,9 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, onS
       const items = await apiService.getSimulationHistory(40);
       setHistory(items);
     } catch (e: any) {
-      setError(e.message || 'Failed to fetch history');
+      setError(
+        'Backend Disconnected: Unable to fetch history from http://127.0.0.1:8000. Start the backend server to access persistent simulation records.'
+      );
     } finally {
       setLoading(false);
     }
@@ -136,7 +138,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, onS
                         {item.pdr != null ? `${item.pdr}%` : '—'}
                       </td>
                       <td className="py-3 px-3 text-slate-600">
-                        {item.delay_ms != null ? `${item.delay_ms}` : '—'}
+                        {item.delay_ms != null ? `${item.delay_ms} ms` : (item.status === 'completed' ? 'N/A' : '—')}
                       </td>
                       <td className="py-3 px-3 text-slate-600">
                         {item.energy_consumed_j != null ? `${item.energy_consumed_j}` : '—'}

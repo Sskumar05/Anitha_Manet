@@ -3,10 +3,15 @@ import {
   SimulationResult,
   SimulationRunStatus,
   SimulationHistoryItem,
+  SimulationMobilityTrace,
+  SimulationLinkTrace,
+  SimulationRoutingTrace,
   BackendHealth,
+  SweepResult,
+  SweepStartRequest,
 } from '../types/simulation';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
 const WS_BASE_URL = import.meta.env.VITE_WS_BASE_URL || API_BASE_URL.replace(/^http/, 'ws');
 
 export const apiService = {
@@ -54,6 +59,33 @@ export const apiService = {
     return res.json();
   },
 
+  async getSimulationMobility(runId: string): Promise<SimulationMobilityTrace> {
+    const res = await fetch(`${API_BASE_URL}/api/simulation/${runId}/mobility`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || `Failed to fetch mobility trace for run: ${runId}`);
+    }
+    return res.json();
+  },
+
+  async getSimulationWirelessLinks(runId: string): Promise<SimulationLinkTrace> {
+    const res = await fetch(`${API_BASE_URL}/api/simulation/${runId}/wireless-links`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || `Failed to fetch wireless link trace for run: ${runId}`);
+    }
+    return res.json();
+  },
+
+  async getSimulationRoutingTrace(runId: string): Promise<SimulationRoutingTrace> {
+    const res = await fetch(`${API_BASE_URL}/api/simulation/${runId}/routing-trace`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || `Failed to fetch routing and data-flow trace for run: ${runId}`);
+    }
+    return res.json();
+  },
+
   async cancelSimulation(runId: string): Promise<{ message: string }> {
     const res = await fetch(`${API_BASE_URL}/api/simulation/${runId}/cancel`, {
       method: 'POST',
@@ -68,6 +100,39 @@ export const apiService = {
     return res.json();
   },
 
+  async startSweep(request: SweepStartRequest): Promise<{ sweep_id: string; status: string; message: string; parameter: string }> {
+    const res = await fetch(`${API_BASE_URL}/api/simulation/sweep/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || 'Failed to start simulation sweep');
+    }
+    return res.json();
+  },
+
+  async getSweepStatus(sweepId: string): Promise<SweepResult> {
+    const res = await fetch(`${API_BASE_URL}/api/simulation/sweep/${sweepId}/status`);
+    if (!res.ok) throw new Error(`Failed to fetch sweep status: ${res.status}`);
+    return res.json();
+  },
+
+  async getLatestSweep(parameter: string): Promise<SweepResult | null> {
+    const res = await fetch(`${API_BASE_URL}/api/simulation/sweep/latest?parameter=${parameter}`);
+    if (!res.ok) throw new Error(`Failed to fetch latest sweep: ${res.status}`);
+    return res.json();
+  },
+
+  async cancelSweep(sweepId: string): Promise<{ message: string }> {
+    const res = await fetch(`${API_BASE_URL}/api/simulation/sweep/${sweepId}/cancel`, {
+      method: 'POST',
+    });
+    if (!res.ok) throw new Error(`Failed to cancel sweep: ${sweepId}`);
+    return res.json();
+  },
+
   connectWebSocket(runId: string, onMessage: (data: any) => void, onError?: (err: any) => void): WebSocket {
     const ws = new WebSocket(`${WS_BASE_URL}/ws/simulation/${runId}`);
     ws.onmessage = (event) => {
@@ -78,7 +143,10 @@ export const apiService = {
         onMessage({ type: 'raw', text: event.data });
       }
     };
-    if (onError) ws.onerror = onError;
+    if (onError) {
+      ws.onerror = onError;
+      ws.onclose = () => onError(new Error('WebSocket connection closed'));
+    }
     return ws;
   },
 };
