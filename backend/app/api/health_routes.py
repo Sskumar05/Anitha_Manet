@@ -3,6 +3,7 @@ import subprocess
 from fastapi import APIRouter
 from app.core.config import settings
 
+_cached_ns3: dict = {"detected": None, "details": ""}
 router = APIRouter(tags=["Health & Info"])
 
 @router.get("/health")
@@ -14,18 +15,23 @@ async def health_check():
     ns3_detected = False
     details = ""
 
-    if wsl_available and settings.USE_WSL:
+    if _cached_ns3["detected"] is True:
+        ns3_detected = True
+        details = _cached_ns3["details"]
+    elif wsl_available and settings.USE_WSL:
         try:
-            # Probe NS-3 directory in WSL
+            # Probe NS-3 directory in WSL (15s timeout for cold start)
             res = subprocess.run(
                 ["wsl", "-d", settings.WSL_DISTRO, "--", "bash", "-c", f"test -d '{settings.NS3_DIR}' && echo 'OK'"],
                 capture_output=True,
                 text=True,
-                timeout=5
+                timeout=15
             )
             if "OK" in res.stdout:
                 ns3_detected = True
                 details = f"NS-3 detected in WSL2 ({settings.WSL_DISTRO}) at {settings.NS3_DIR}"
+                _cached_ns3["detected"] = True
+                _cached_ns3["details"] = details
             else:
                 details = f"NS-3 directory not found at {settings.NS3_DIR}"
         except Exception as e:
@@ -49,38 +55,61 @@ async def health_check():
 @router.get("/simulation/config")
 async def get_simulation_default_config():
     """
-    Returns allowable simulation parameter ranges and default configurations.
+    Returns allowable simulation parameter ranges and real sweep parameter metadata.
+    Static benchmark datasets have been completely removed.
     """
     return {
-        "protocols": ["AODV", "eAODV", "BOTH"],
+        "protocols": ["AODV", "eAODV"],
         "node_count": {"min": 10, "max": 100, "default": 50, "step": 5},
         "mobility_speed": {"min": 1.0, "max": 25.0, "default": 10.0, "unit": "m/s", "step": 1.0},
+        "traffic_flows": {"min": 1, "max": 30, "default": 4, "step": 1},
         "simulation_area": [
             {"value": 500, "label": "500×500m (Dense)"},
             {"value": 1000, "label": "1000×1000m (Standard)", "default": True},
             {"value": 2000, "label": "2000×2000m (Sparse)"}
         ],
-        "default_scenarios": {
+        "sweep_metadata": {
             "speed": {
-                "labels": ["2 m/s", "5 m/s", "10 m/s", "15 m/s", "20 m/s", "25 m/s"],
-                "pdr": {"aodv": [87, 84, 78, 70, 62, 53], "eaodv": [94, 92, 91, 88, 84, 79]},
-                "delay": {"aodv": [28, 36, 54, 72, 91, 118], "eaodv": [18, 24, 42, 56, 68, 84]},
-                "overhead": {"aodv": [0.22, 0.30, 0.44, 0.58, 0.72, 0.88], "eaodv": [0.16, 0.22, 0.31, 0.40, 0.51, 0.63]},
-                "energy": {"aodv": [1.2, 1.5, 1.8, 2.2, 2.6, 3.1], "eaodv": [0.9, 1.1, 1.24, 1.5, 1.8, 2.2]}
+                "parameter": "speed",
+                "label": "Node Speed",
+                "unit": "m/s",
+                "x_title": "Node Speed (m/s)",
+                "default_points": [5.0, 10.0, 15.0, 20.0],
+                "default_base_config": {
+                    "node_count": 30,
+                    "simulation_area": 1000,
+                    "simulation_time": 5.0,
+                    "rng_seed": 1,
+                    "traffic_flows": 4
+                }
             },
             "nodes": {
-                "labels": ["20", "30", "50", "70", "100"],
-                "pdr": {"aodv": [82, 79, 73, 68, 61], "eaodv": [91, 89, 86, 83, 79]},
-                "delay": {"aodv": [32, 45, 58, 75, 98], "eaodv": [22, 31, 42, 54, 70]},
-                "overhead": {"aodv": [0.19, 0.28, 0.44, 0.60, 0.78], "eaodv": [0.14, 0.21, 0.31, 0.43, 0.58]},
-                "energy": {"aodv": [0.9, 1.2, 1.6, 2.1, 2.8], "eaodv": [0.7, 0.9, 1.2, 1.5, 2.0]}
+                "parameter": "nodes",
+                "label": "Number of Nodes",
+                "unit": "nodes",
+                "x_title": "Number of Nodes",
+                "default_points": [20.0, 30.0, 50.0, 70.0],
+                "default_base_config": {
+                    "mobility_speed": 10.0,
+                    "simulation_area": 1000,
+                    "simulation_time": 5.0,
+                    "rng_seed": 1,
+                    "traffic_flows": 4
+                }
             },
             "traffic": {
-                "labels": ["5 flows", "10 flows", "20 flows", "30 flows", "50 flows"],
-                "pdr": {"aodv": [88, 82, 74, 64, 54], "eaodv": [95, 91, 87, 80, 72]},
-                "delay": {"aodv": [25, 40, 62, 88, 122], "eaodv": [18, 30, 46, 65, 90]},
-                "overhead": {"aodv": [0.18, 0.30, 0.50, 0.72, 0.95], "eaodv": [0.14, 0.23, 0.37, 0.54, 0.72]},
-                "energy": {"aodv": [0.8, 1.2, 1.7, 2.3, 3.0], "eaodv": [0.6, 0.9, 1.3, 1.7, 2.3]}
+                "parameter": "traffic",
+                "label": "Traffic Load",
+                "unit": "flows",
+                "x_title": "Traffic Load (flows)",
+                "default_points": [2.0, 4.0, 8.0, 12.0],
+                "default_base_config": {
+                    "node_count": 35,
+                    "mobility_speed": 10.0,
+                    "simulation_area": 1000,
+                    "simulation_time": 5.0,
+                    "rng_seed": 1
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ env/
 results/*.xml
 results/graphs/*.png
 results/final/
+backend/results/
 
 # OS files
 .DS_Store
