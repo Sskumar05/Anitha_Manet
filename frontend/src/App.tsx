@@ -213,7 +213,7 @@ export const App: React.FC = () => {
           }
         },
         () => {
-          addLog(`[WS ERROR] WebSocket connection closed. Polling backend status fallback active.`);
+          addLog(`[WS STATUS] WebSocket connection closed. Polling backend status fallback active.`);
         }
       );
       wsRef.current = ws;
